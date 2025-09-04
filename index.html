@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LiveTV+ by SinghJi</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0a0f24;
+        color: white;
+      }
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 24px;
+        background: #081022;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+      }
+      .navbar h1 {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .navbar h1 span {
+        color: #facc15;
+      }
+      .nav-links {
+        display: flex;
+        gap: 20px;
+        font-size: 14px;
+      }
+      .nav-links div {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .nav-links .active {
+        color: #facc15;
+      }
+      .search-box {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .search-box input {
+        width: 50%;
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: none;
+        outline: none;
+        background: #1c2239;
+        color: white;
+      }
+      .categories {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 16px;
+      }
+      .categories button {
+        padding: 6px 14px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        background: #1c2239;
+        color: white;
+        transition: 0.2s;
+      }
+      .categories button.active {
+        background: #facc15;
+        color: black;
+      }
+      .categories button:hover {
+        background: #2a3250;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+        padding: 20px;
+      }
+      .card {
+        background: #111833;
+        border-radius: 16px;
+        padding: 12px;
+        text-align: center;
+        position: relative;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .card:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+      }
+      .card img {
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 8px;
+      }
+      .card h3 {
+        font-size: 14px;
+        font-weight: bold;
+        margin: 4px 0;
+      }
+      .card p {
+        font-size: 12px;
+        color: #aaa;
+      }
+      .badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        background: #facc15;
+        color: black;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      .fav-btn {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .fav-active {
+        color: red;
+      }
+      .contact {
+        text-align: center;
+        padding: 30px;
+        color: #ccc;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div class="navbar">
+      <h1><span>LiveTv+</span> by SinghJi</h1>
+      <div class="nav-links">
+        <div id="nav-home" class="active">🏠 Home</div>
+        <div id="nav-fav">❤️ Fav</div>
+        <div id="nav-recent">⏰ Recent</div>
+        <div id="nav-contact">✉️ Contact</div>
+      </div>
+    </div>
+
+    <!-- Search + Categories -->
+    <div id="home-section">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="Search for a channel..." />
+      </div>
+      <div class="categories" id="categories"></div>
+    </div>
+
+    <!-- Channel Grid -->
+    <div class="grid" id="channel-grid"></div>
+
+    <!-- Contact -->
+    <div class="contact hidden" id="contact-section">
+      <h2>Contact Us</h2>
+      <p>Email: support@TengrariSinghji.com</p>
+      <p>Phone: +9194312668**</p>
+    </div>
+
+    <script>
+      const categories = [
+        "All",
+        "OTT",
+
+        "Entertainment",
+        "Informative",
+
+        "Kids",
+        "News",
+        "Devotional",
+        "Movies",
+
+        "Sports",
+      ];
+
+      const channels = [
+        {
+          id: 1,
+          name: "Sony Sab HD",
+          logo: "https://upload.wikimedia.org/wikipedia/hi/d/d4/Sony_Sab_new_logo.png",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D63566",
+        },
+        {
+          id: 2,
+          name: "Sony TV",
+          logo: "https://companylogos.org/wp-content/uploads/2024/12/Sony-Entertainment-Television-2016-256x300.png",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276915",
+        },
+        {
+          id: 3,
+          name: "Colors HD",
+          logo: "https://cdn.colorstv.com/wp-content/uploads/2019/04/colors_1555156048.jpg",
+          provider: "HINDI",
+          category: "Entertainment",
+          hd: true,
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276925",
+        },
+        {
+          id: 4,
+          name: "StarPlus",
+          logo: "https://imgs.search.brave.com/hFa6_OPoY5ni_8LAiJ_eZRA_W6xn08hHiBADPHVRa-0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9wcmV2/aWV3LnJlZGQuaXQv/d2FzLXlvdW5nLWVu/b3VnaC10by1yZW1l/bWJlci13aGVuLXN0/YXItcGx1cy1yZWJy/YW5kZWQtYmFjay12/MC1zOHViZ291aHBz/ZWUxLmpwZWc_d2lk/dGg9NjQwJmNyb3A9/c21hcnQmYXV0bz13/ZWJwJnM9Mjg4Y2Vk/YjlmMDI2ZWFjODQ3/ZmIyNGU3NDEzOGQ3/NTAzZmJmNzczMA",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276912",
+        },
+        {
+          id: 5,
+          name: "Zee TV HD",
+          logo: "https://1000logos.net/wp-content/uploads/2021/12/Zee-TV-Logo-2017-1-500x281.png",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://mini.allinonereborn.online/ze/play.php?id=https://z5ak-cmaflive.zee5.com/cmaf/live/2105531/ZeeTVHDMSLELE/index-connected.m3u8",
+        },
+        {
+          id: 6,
+          name: "& TV HD",
+          logo: "data:image/jpeg;base64,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",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://mini.allinonereborn.online/ze/play.php?id=https://z5ak-cmaflive.zee5.com/cmaf/live/2105504/AndTVHDELE/index-connected.m3u8",
+        },
+        {
+          id: 7,
+          name: "CARTOON NETWORK HD",
+          logo: "https://imgs.search.brave.com/5hXUOgrqFAJe2jn5z8p1CTLmp5l6h0XNI4AE1W2c9xE/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy8x/LzEyL0NhcnRvb24t/TmV0d29yay1IRC1j/b3Zlci5qcGc",
+          provider: "CN",
+          category: "Kids",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277015",
+        },
+        {
+          id: 7,
+          name: "CARTOON NETWORK",
+          logo: "https://imgs.search.brave.com/sT6DRTWB_FnIFMvz5s6CTT9emjxOMerwNX6pEy6M21s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9iYW5u/ZXIyLmNsZWFucG5n/LmNvbS8yMDE4MDUw/OS9ha3cvYXZjM3ly/dmZvLndlYnA",
+          provider: "CN",
+          category: "Kids",
+          url: "https://amitb3669.github.io/jiotv-plus/player.html?Cartoon%20Network%20Hindi",
+        },
+        {
+          id: 8,
+          name: "POGO",
+          logo: "https://imgs.search.brave.com/h97StSIyDCrjshdUQussgyzk_p8FDhsjo_mRpSttFFE/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9sb2dv/ZGl4LmNvbS9sb2dv/LzIwMDYyODcuanBn",
+          provider: "pogo",
+          category: "Kids",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276997",
+        },
+        {
+          id: 9,
+          name: "DISNEY CHANNEL",
+          logo: "https://imgs.search.brave.com/TTu_IN1wny-L01VteEmuHsXAKEz5iYr8dLbgkBQVPe0/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly93YWxs/cGFwZXJiYXQuY29t/L2ltZy85MDgwODct/ZG93bmxvYWQtZGlz/bmV5LWNoYW5uZWwt/c3R5bGl6ZWQtbG9n/by13YWxscGFwZXIu/anBn",
+          provider: "disney",
+          category: "Kids",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277002",
+        },
+        {
+          id: 10,
+          name: "NICK",
+          logo: "data:image/jpeg;base64,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",
+          provider: "nick",
+          category: "Kids",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D1441464",
+        },
+        {
+          id: 11,
+          name: "HUNGAMA",
+          logo: "https://imgs.search.brave.com/VxWr6wdZFcOeJcTCLVHVEotygreSJ6Rc7Nannda3ZpQ/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly9zdGF0/aWMud2lraWEubm9j/b29raWUubmV0L2Rp/c25leS9pbWFnZXMv/OS85Yy9IdW5nYW1h/X3R2X2xvZ28uanBn/L3JldmlzaW9uL2xh/dGVzdD9jYj0yMDEy/MTAwNzAxMzgyOQ",
+          provider: "disney",
+          category: "Kids",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D1441461",
+        },
+        {
+          id: 12,
+          name: "SUPER HUNGAMA",
+          logo: "https://tvschedule.today/_next/image?url=https://jiotvimages.cdn.jio.com/dare_images/images/200/-/Super_Hungama.png&w=256&q=75",
+          provider: "disney",
+          category: "Kids",
+          url: "https://amitb3669.github.io/jiotv-plus/player.html?Super%20Hungama",
+        },
+        {
+          id: 13,
+          name: "STAR GOLD HD",
+          logo: "https://www.nicepng.com/png/detail/248-2482573_hindi-movies-hd-star-gold-channel-live-tv.png",
+          provider: "HINDI",
+          category: "Movies",
+          url: "https://amitb3669.github.io/jiotv-plus/player.html?Star%20Gold%20HD",
+        },
+        {
+          id: 14,
+          name: "STAR GOLD 2 HD",
+          logo: "https://img-cdn.publive.online/fit-in/580x348/filters:format(webp)/afaqs/media/post_attachments/41d240a6a57208111c1d55f18e3e947681cc1aaca30c8cfdadff35afa5bf55d9.png",
+          provider: "HINDI",
+          category: "Movies",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277061",
+        },
+        {
+          id: 15,
+          name: "STAR MOVIES HD",
+          logo: "https://imgs.search.brave.com/O-6vRf1BVW2_in5XTb4lnfjpxSX0UBYf8PfxULgOAKQ/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9oZHBu/Zy5jb20vaW1hZ2Vz/L3N0YXItbW92aWVz/LWxvZ28tcG5nLXN0/YXItbW92aWVzLXN0/YXItbW92aWVzLXNl/bGVjdC1oZC10by1h/aXItd2hpcGxhc2gt/YW5kLWZhbnRhc3Rp/Yy1mb3VyLXRoaXMt/d2Vla2VuZC0zMDAu/anBn",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D63511",
+        },
+        {
+          id: 16,
+          name: "STAR MOVIES SELECTED ",
+          logo: "https://imgs.search.brave.com/UwX0wMd-HuhXWU7CnRosrpfiR0kumRnTAYJw-YO3F3c/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly93d3cu/bHluZ3NhdC5jb20v/bG9nby90di9zcy9z/dGFyLW1vdmllcy1z/ZWxlY3QtaGsucG5n",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D63510",
+        },
+        {
+          id: 17,
+          name: "SONY PIX",
+          logo: "https://imgs.search.brave.com/mVH3VMklfYWkYh-TFv05Rb8KcoN-xq22DrYwi3iCoOg/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbmRp/YW50dmluZm8uY29t/L21lZGlhLzIwMjIv/MTAvU29ueS1QSVgt/TmV3LUxvZ28tMzAw/eDMwMC5wbmc",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276918",
+        },
+        {
+          id: 18,
+          name: "HBO",
+          logo: "https://logodix.com/logo/95871.jpg",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D361401",
+        },
+        {
+          id: 19,
+          name: "HBO 2",
+          logo: "https://logodix.com/logo/2044148.jpg",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D361404",
+        },
+        {
+          id: 20,
+          name: "MOVIES NOW",
+          logo: "data:image/jpeg;base64,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",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D112877",
+        },
+        {
+          id: 21,
+          name: "MNX",
+          logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbCwOG_sRqauYObfSS4KzEyaHfEDfp1dRjzw&s",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D112876",
+        },
+        {
+          id: 22,
+          name: "& FLIX HD",
+          logo: "https://www.bizasialive.com/wp-content/uploads/2018/05/andflix002.jpg",
+          provider: "ENGLISH",
+          category: "Movies",
+          url: "https://mini.allinonereborn.online/ze/play.php?id=https://z5ak-cmaflive.zee5.com/cmaf/live/2105517/AndFlixHDELE/index-connected.m3u8",
+        },
+        {
+          id: 23,
+          name: "ZEE CINEMA HD",
+          logo: "data:image/png;base64,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",
+          provider: "HINDI",
+          category: "Movies",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276907",
+        },
+        {
+          id: 24,
+          name: "SONY MAX",
+          logo: "https://imgs.search.brave.com/khcNjugLZ7cLFlYiGPZKky1qHYLoeX3dhkPiRS2IqBM/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly93d3cu/dHZtYWxheXNpYS5s/aXZlL2ltYWdlcy9z/b255LW1heC1oZC1s/aXZlLndlYnA",
+          provider: "HINDI",
+          category: "Movies",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276916",
+        },
+        {
+          id: 25,
+          name: "&PICTURES HD",
+          logo: "data:image/jpeg;base64,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",
+          provider: "HINDI",
+          category: "Movies",
+          url: "https://mini.allinonereborn.online/ze/play.php?id=https://z5ak-cmaflive.zee5.com/cmaf/live/2105174/ANDPicturesHDELE/index-connected.m3u8",
+        },
+        {
+          id: 26,
+          name: "ZEE CLASSIC",
+          logo: "https://imgs.search.brave.com/7aSb9DYrGx2au84drSmDAzQGoGBVyHkWRD8xXnpsMc8/rs:fit:0:180:1:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMtcHJvZC56ZWUu/Y29tL3dwLWNvbnRl/bnQvdXBsb2Fkcy8y/MDIxLzA4LzIzMTQz/MjI3L3plZWNsYXNz/aWMtc2QucG5n",
+          provider: "HINDI",
+          category: "Movies",
+          url: "https://mini.allinonereborn.online/ze/play.php?id=https://z5ak-cmaflive.zee5.com/cmaf/live/2105547/ZeeClassicELE/master.m3u8",
+        },
+        {
+          id: 27,
+          name: "CNBC TV18",
+          logo: "https://imgs.search.brave.com/iPqz25KoJ1oPw17BMOoL1hoRB01gEMjTMshPcjq2Jek/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9iYW5u/ZXIyLmNsZWFucG5n/LmNvbS8yMDE4MDQy/MC9oZHEvYXZmdjgx/NnNxLndlYnA",
+          provider: "ENGLISH",
+          category: "News",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277003",
+        },
+        {
+          id: 28,
+          name: "CNN",
+          logo: "https://brandeps.com/logo-download/C/CNN-logo-vector-01.svg",
+          provider: "ENGLISH",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D745639",
+        },
+        {
+          id: 29,
+          name: "ET NOW",
+          logo: "https://imgs.search.brave.com/Qupx72f8Y-nV2iJkUgLYr1WlC5-SaJx_Y-T1IUkRr14/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9sb2dv/dHlwLnVzL2ZpbGUv/ZXQtbm93LnN2Zw",
+          provider: "ENGLISH",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D63441",
+        },
+        {
+          id: 30,
+          name: "INDIA TODAY",
+          logo: "https://images.seeklogo.com/logo-png/44/2/india-today-logo-png_seeklogo-440312.png",
+          provider: "ENGLISH",
+          category: "News",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277053",
+        },
+        {
+          id: 31,
+          name: "BBC NEWS",
+          logo: "https://logos-world.net/wp-content/uploads/2024/12/BBC-News-Logo-2013-500x281.png",
+          provider: "ENGLISH",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D100681",
+        },
+        {
+          id: 32,
+          name: "DW News",
+          logo: "https://logotyp.us/file/dw-tv.svg",
+          provider: "ENGLISH",
+          category: "News",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D1163776",
+        },
+        {
+          id: 33,
+          name: "Republic News",
+          logo: "https://logotyp.us/file/republic-bharat.svg",
+          provider: "HINDI",
+          category: "News",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277016",
+        },
+        {
+          id: 34,
+          name: "ARY NEWS",
+          logo: "https://imgs.search.brave.com/EkHpv2muTY6niRuN1d2NFHN6Ua339v0M0OOeGQGoh8s/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9wbGF5/LWxoLmdvb2dsZXVz/ZXJjb250ZW50LmNv/bS95Ykx0X0x6cEQ4/czdXX1VER0NjNEEt/Sm03cjVTeHFubE5r/MmJMSTZjM0phaEVu/YU4xZ1VuWHdWRm5s/anJjOHU4QkhvPXcy/NDAtaDQ4MC1ydw",
+          provider: "Urdu",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D99660",
+        },
+        {
+          id: 35,
+          name: "Geo News",
+          logo: "https://banner2.cleanpng.com/20180606/ero/aa9v5qizi.webp",
+          provider: "Urdu",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D710",
+        },
+        {
+          id: 36,
+          name: "Dunya News",
+          logo: "https://upload.wikimedia.org/wikipedia/en/1/10/Dunya_News.jpg",
+          provider: "Urdu",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D99666",
+        },
+        {
+          id: 37,
+          name: "Express News",
+          logo: "https://imgs.search.brave.com/sPB9DsK0kbrCOz1j5ATAKpVBbF6XEBmWwxwUXdJny1E/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMuc2Vla2xvZ28u/Y29tL2xvZ28tcG5n/LzM5LzEvZXhwcmVz/cy1uZXdzLWxvZ28t/cG5nX3NlZWtsb2dv/LTM5MDY1My5wbmc_/dj0xOTU1MzA1MzY3/MDMyNjUzNjQw",
+          provider: "Urdu",
+          category: "News",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D99668",
+        },
+        {
+          id: 38,
+          name: "AASTHA HD",
+          logo: "https://bestmediainfo.com/uploads/2018/05/Aastha-Group1_8.jpg",
+          provider: "HINDI",
+          category: "Devotional",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276930",
+        },
+        {
+          id: 39,
+          name: "DISCOVERY WORLD HD",
+          logo: "https://banner2.cleanpng.com/20180628/jav/aaygmvgb0.webp",
+          provider: "HINDI",
+          category: "Informative",
+          url: "https://allinonereborn.fun/sansat-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fsansat-web%2Flive.php%3Fid%3D63315",
+        },
+        {
+          id: 40,
+          name: "HISTORY TV18 HD",
+          logo: "https://img.favpng.com/7/8/16/history-tv18-television-channel-television-show-png-favpng-9GBz49cxXHYiCXxQwA5s8E5XY_t.jpg",
+          provider: "HINDI",
+          category: "Informative",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276958",
+        },
+        {
+          id: 41,
+          name: "STAR SPORTS 2 HD",
+          logo: "https://www.nicepng.com/png/full/952-9522547_top-10-most-famous-indian-television-channels-star.png",
+          provider: "HINDI",
+          category: "Sports",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276732",
+        },
+        {
+          id: 42,
+          name: "DISNEY INTRNATIONAL",
+          logo: "https://static.wikitide.net/avidwiki/thumb/c/cd/Disney_Channel_Original.jpeg/534px-Disney_Channel_Original.jpeg",
+          provider: "ENGLISH",
+          category: "Entertainment",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277009",
+        },
+        {
+          id: 43,
+          name: "DANGAL",
+          logo: "https://pnghdpro.com/wp-content/themes/pnghdpro/download/social-media-and-brands/dangal-tv-channel-logo.png",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D277020",
+        },
+        {
+          id: 44,
+          name: "MTV HD",
+          logo: "https://images.seeklogo.com/logo-png/32/2/mtv-live-hd-2017-logo-png_seeklogo-324967.png",
+          provider: "HINDI",
+          category: "Entertainment",
+          url: "https://allinonereborn.fun/airteltv-web/player.html?url=https%3A%2F%2Fallinonereborn.fun%2Fairteltv-web%2Flive.php%3Fid%3D276968",
+        },
+        {
+          id: 45,
+          name: "OTT(NETFLIX)",
+          logo: "https://netmirror.in/wp-content/uploads/2025/08/net-mirror-logo.webp",
+          provider: "MIX",
+          category: "OTT",
+          url: "https://net2025.cc/home",
+        },
+      ];
+
+      let activeCat = "All";
+      let activeView = "home";
+      let favIds = JSON.parse(localStorage.getItem("favourites") || "[]");
+      let recentIds = JSON.parse(localStorage.getItem("recent") || "[]");
+
+      const grid = document.getElementById("channel-grid");
+      const searchBox = document.getElementById("search");
+
+      // Render categories
+      const catContainer = document.getElementById("categories");
+      categories.forEach((cat) => {
+        const btn = document.createElement("button");
+        btn.textContent = cat;
+        if (cat === "All") btn.classList.add("active");
+        btn.onclick = () => {
+          activeCat = cat;
+          document
+            .querySelectorAll(".categories button")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          renderChannels();
+        };
+        catContainer.appendChild(btn);
+      });
+
+      // Render channels
+      function renderChannels() {
+        grid.innerHTML = "";
+        let filtered = channels;
+
+        if (activeView === "home") {
+          const q = searchBox.value.trim().toLowerCase();
+          filtered = channels.filter((c) => {
+            const catOk =
+              activeCat === "All" ||
+              c.category.toLowerCase() === activeCat.toLowerCase() ||
+              c.provider.toLowerCase() === activeCat.toLowerCase();
+            const searchOk =
+              q === "" ||
+              c.name.toLowerCase().includes(q) ||
+              c.provider.toLowerCase().includes(q) ||
+              c.category.toLowerCase().includes(q);
+            return catOk && searchOk;
+          });
+        } else if (activeView === "fav") {
+          filtered = channels.filter((c) => favIds.includes(c.id));
+        } else if (activeView === "recent") {
+          filtered = channels.filter((c) => recentIds.includes(c.id));
+        }
+
+        if (filtered.length === 0) {
+          grid.innerHTML =
+            "<p style='grid-column:1/-1;text-align:center;color:#aaa'>No channels found</p>";
+          return;
+        }
+
+        filtered.forEach((ch) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+          <img src="${ch.logo}" alt="${ch.name}">
+          <h3>${ch.name}</h3>
+          <p>${ch.category} · ${ch.provider}</p>
+          ${ch.hd ? '<span class="badge">HD</span>' : ""}
+          <span class="fav-btn ${
+            favIds.includes(ch.id) ? "fav-active" : ""
+          }">♥</span>
+        `;
+          card.onclick = () => {
+            if (!recentIds.includes(ch.id)) {
+              recentIds.push(ch.id);
+              localStorage.setItem("recent", JSON.stringify(recentIds));
+            }
+            window.open(ch.url, "_blank");
+          };
+          card.querySelector(".fav-btn").onclick = (e) => {
+            e.stopPropagation();
+            if (favIds.includes(ch.id)) {
+              favIds = favIds.filter((f) => f !== ch.id);
+            } else {
+              favIds.push(ch.id);
+            }
+            localStorage.setItem("favourites", JSON.stringify(favIds));
+            renderChannels();
+          };
+          grid.appendChild(card);
+        });
+      }
+
+      searchBox.addEventListener("input", renderChannels);
+
+      // Navigation
+      function setActiveView(view) {
+        activeView = view;
+        document
+          .querySelectorAll(".nav-links div")
+          .forEach((n) => n.classList.remove("active"));
+        document.getElementById("nav-" + view).classList.add("active");
+        document
+          .getElementById("home-section")
+          .classList.toggle("hidden", view !== "home");
+        document
+          .getElementById("contact-section")
+          .classList.toggle("hidden", view !== "contact");
+        grid.classList.toggle("hidden", view === "contact");
+        renderChannels();
+      }
+      document.getElementById("nav-home").onclick = () => setActiveView("home");
+      document.getElementById("nav-fav").onclick = () => setActiveView("fav");
+      document.getElementById("nav-recent").onclick = () =>
+        setActiveView("recent");
+      document.getElementById("nav-contact").onclick = () =>
+        setActiveView("contact");
+
+      // Initial render
+      renderChannels();
+    </script>
+  </body>
+</html>
